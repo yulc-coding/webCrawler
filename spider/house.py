@@ -8,7 +8,6 @@ import pymongo
 """
 
 MONGO_HOST = 'localhost'
-# MONGO_HOST = '94.191.8.173'
 MONGO_PORT = 27017
 # 用户验证时需要
 AUTH_USER = "admin"
