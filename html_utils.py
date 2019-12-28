@@ -1,6 +1,6 @@
 import requests
 import re
-from common.constants import FAKE_HEADERS
+from constants import FAKE_HEADERS
 
 """解析网页相关方法"""
 

@@ -1,4 +1,4 @@
-from spider.house import NewHouse, SaleHouse
+from house import NewHouse, SaleHouse
 import time
 
 

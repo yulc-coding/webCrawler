@@ -1,7 +1,10 @@
 from pyquery import PyQuery as pyQuery
 import time
-from utils.html_utils import get_html, analysis_price
+from html_utils import get_html, analysis_price
 import pymongo
+from spider_logger import SpiderLogger
+import traceback
+from mail_notice import send_mail
 
 """
 安居客房源信息统计（楼盘+二手房）
@@ -24,6 +27,8 @@ class NewHouse(object):
         self.db_name = 'spiders'
         self.collection_name = 'new_house'
         self.collection = None
+        self.total = 0
+        self.new_log = SpiderLogger('./log/new_house.log', level='info')
 
     def analyze_info(self, url):
         """
@@ -70,33 +75,42 @@ class NewHouse(object):
             }
             # 加入列表中
             house_list.append(house_info)
+        self.total += len(house_list)
         # 本页数据批量存入MongoDB中
         self.collection.insert(house_list)
         # 获取下一页，如果有下一页的，继续爬取下一页的内容
         next_url = doc('.list-page .next-page').attr('href')
         if next_url:
             time.sleep(2)
-            print('next:', next_url)
+            self.new_log.logger.info('next => %s' % next_url)
             self.analyze_info(next_url)
 
     def run_spider(self):
-        # 连接mongoDB 默认localhost:27017
-        # client = pymongo.MongoClient(host=MONGO_HOST, port=MONGO_PORT, username=AUTH_USER, password=AUTH_PWD)
-        client = pymongo.MongoClient(host=MONGO_HOST, port=MONGO_PORT)
-        db = client[self.db_name]
-        self.collection = db[self.collection_name]
+        client = None
+        try:
+            # 连接mongoDB 默认localhost:27017
+            # client = pymongo.MongoClient(host=MONGO_HOST, port=MONGO_PORT, username=AUTH_USER, password=AUTH_PWD)
+            client = pymongo.MongoClient(host=MONGO_HOST, port=MONGO_PORT)
+            db = client[self.db_name]
+            self.collection = db[self.collection_name]
 
-        print('new start ... 清空今日楼盘数据：', self.report_date)
-        self.collection.remove({'report_date': self.report_date})
+            self.new_log.logger.info('new start ... 清空今日楼盘数据 => %s' % self.report_date)
+            self.collection.remove({'report_date': self.report_date})
 
-        # 首页地址
-        url = 'https://jx.fang.anjuke.com/loupan/all/'
-        # 解析网页，并存储数据
-        self.analyze_info(url)
+            # 首页地址
+            url = 'https://jx.fang.anjuke.com/loupan/all/'
+            # 解析网页，并存储数据
+            self.analyze_info(url)
 
-        # 关闭mongodb连接
-        client.close()
-        print('end new')
+            self.new_log.logger.info('end new <= %s，total: %s' % (self.report_date, self.total))
+        except BaseException as e:
+            self.new_log.logger.error("%s new error %s____%s" % (self.report_date, BaseException, e))
+            self.new_log.logger.error(traceback.format_exc())
+            send_mail('webCrawler', '执行楼盘任务异常：' + traceback.format_exc())
+        finally:
+            # 关闭mongodb连接
+            client.close()
+            self.new_log.logger.info('close mongodb new')
 
 
 class SaleHouse(object):
@@ -109,6 +123,8 @@ class SaleHouse(object):
         self.db_name = 'spiders'
         self.collection_name = 'sale_house'
         self.collection = None
+        self.total = 0
+        self.sale_log = SpiderLogger('./log/sale_house.log', level='info')
 
     def analyze_info(self, url):
         """
@@ -149,30 +165,39 @@ class SaleHouse(object):
             }
             # 加入列表中
             house_list.append(house_info)
-            # 批量存入MongoDB中
+        self.total += len(house_list)
+        # 批量存入MongoDB中
         self.collection.insert(house_list)
         # 获取下一页，如果有下一页的，继续爬取下一页的内容
         next_url = doc('.multi-page .aNxt').attr('href')
         if next_url:
             time.sleep(2)
-            print('next:', next_url)
+            self.sale_log.logger.info('next => %s' % next_url)
             self.analyze_info(next_url)
 
     def run_spider(self):
-        # 连接mongoDB 默认localhost:27017
-        # client = pymongo.MongoClient(host=MONGO_HOST, port=MONGO_PORT, username=AUTH_USER, password=AUTH_PWD)
-        client = pymongo.MongoClient(host=MONGO_HOST, port=MONGO_PORT)
-        db = client[self.db_name]
-        self.collection = db[self.collection_name]
+        client = None
+        try:
+            # 连接mongoDB 默认localhost:27017
+            # client = pymongo.MongoClient(host=MONGO_HOST, port=MONGO_PORT, username=AUTH_USER, password=AUTH_PWD)
+            client = pymongo.MongoClient(host=MONGO_HOST, port=MONGO_PORT)
+            db = client[self.db_name]
+            self.collection = db[self.collection_name]
 
-        print('sale start ... 清空今日二手房数据：', self.report_date)
-        self.collection.remove({'report_date': self.report_date})
+            print('sale start ... 清空今日二手房数据：', self.report_date)
+            self.collection.remove({'report_date': self.report_date})
 
-        # 首页地址
-        url = 'https://jx.anjuke.com/sale/'
-        # 解析源码，并存储数据
-        self.analyze_info(url)
+            # 首页地址
+            url = 'https://jx.anjuke.com/sale/'
+            # 解析源码，并存储数据
+            self.analyze_info(url)
 
-        # 关闭mongodb连接
-        client.close()
-        print('end sale')
+            self.sale_log.logger.info('end sale <= %s，total: %s' % (self.report_date, self.total))
+        except BaseException as e:
+            self.sale_log.logger.error("%s sale error %s____%s" % (self.report_date, BaseException, e))
+            self.sale_log.logger.error(traceback.format_exc())
+            send_mail('webCrawler', '执行二手房任务异常：' + traceback.format_exc())
+        finally:
+            # 关闭mongodb连接
+            client.close()
+            self.sale_log.logger.info('close mongodb sale')
