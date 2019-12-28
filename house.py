@@ -53,7 +53,8 @@ class NewHouse(object):
                 # 城市
                 'city': city,
                 # 名称
-                'name': item.find('.lp-name h3').text(),
+                # 'name': item.find('.lp-name h3').text(),
+                'name': item.find('.items-name').text(),
                 # 户型
                 'house_type': ' '.join(item.find('.huxing').text().split()),
                 # 地址
