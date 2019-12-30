@@ -2,7 +2,7 @@ from pyquery import PyQuery as pyQuery
 import time
 from html_utils import get_html, analysis_price
 import pymongo
-from spider_logger import SpiderLogger
+from spider_logger import DateFileLogger
 import traceback
 from mail_notice import send_mail
 
@@ -24,11 +24,11 @@ class NewHouse(object):
 
     def __init__(self, report_date):
         self.report_date = report_date
-        self.db_name = 'spiders'
+        self.db_name = 'frame'
         self.collection_name = 'new_house'
         self.collection = None
         self.total = 0
-        self.new_log = SpiderLogger('./log/new_house.log', level='info')
+        self.new_log = DateFileLogger('/var/python/crawler/log/new_house_' + str(report_date) + '.log', level='info')
 
     def analyze_info(self, url):
         """
@@ -121,11 +121,11 @@ class SaleHouse(object):
 
     def __init__(self, report_date):
         self.report_date = report_date
-        self.db_name = 'spiders'
+        self.db_name = 'frame'
         self.collection_name = 'sale_house'
         self.collection = None
         self.total = 0
-        self.sale_log = SpiderLogger('./log/sale_house.log', level='info')
+        self.sale_log = DateFileLogger('/var/python/crawler/log/sale_house_' + str(report_date) + '.log', level='info')
 
     def analyze_info(self, url):
         """
