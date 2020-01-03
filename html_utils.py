@@ -5,13 +5,17 @@ from constants import FAKE_HEADERS
 """解析网页相关方法"""
 
 
-def get_html(url):
+def get_html(url, referer):
     """
     获取网页
     :param url: 连接地址
+    :param referer: 防盗链
     :return: html
     """
-    response = requests.get(url, headers=FAKE_HEADERS)
+    headers = FAKE_HEADERS
+    if referer:
+        headers['Referer'] = referer
+    response = requests.get(url, headers=headers)
     if response.status_code == 200:
         return response.text
     return None

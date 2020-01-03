@@ -6,12 +6,11 @@ headers = {
 }
 
 FAKE_HEADERS = {
-    'Accept': '*/*',
-    'Accept-Language': 'en-US,en;q=0.8',
-    'Cache-Control': 'max-age=0',
-    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 Safari/537.36',
-    'Connection': 'keep-alive',
-    'Referer': 'http://www.baidu.com/'
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'Accept-Language': 'zh-CN,zh;q=0.9',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36',
+    'Referer': 'https://jx.anjuke.com/?pi=PZ-baidu-pc-all-biaoti'
 }
 
 IOS_USERAGENT = '''

@@ -28,6 +28,7 @@ class NewHouse(object):
         self.collection_name = 'new_house'
         self.collection = None
         self.total = 0
+        self.referer = 'https://jx.anjuke.com/?pi=PZ-baidu-pc-all-biaoti'
         self.new_log = DateFileLogger('/var/python/crawler/log/new_house_' + str(report_date) + '.log', level='info')
 
     def analyze_info(self, url):
@@ -36,7 +37,7 @@ class NewHouse(object):
         :param url: 网页地址
         """
         house_list = []
-        doc = pyQuery(get_html(url))
+        doc = pyQuery(get_html(url, self.referer))
         items = doc('.key-list .item-mod').items()
         for item in items:
             address = item.find('.address').text()
@@ -82,6 +83,8 @@ class NewHouse(object):
         # 获取下一页，如果有下一页的，继续爬取下一页的内容
         next_url = doc('.list-page .next-page').attr('href')
         if next_url:
+            # 引用上一个访问地址
+            self.referer = url
             time.sleep(2)
             self.new_log.logger.info('next => %s' % next_url)
             self.analyze_info(next_url)
@@ -99,7 +102,7 @@ class NewHouse(object):
             self.collection.remove({'report_date': self.report_date})
 
             # 首页地址
-            url = 'https://jx.fang.anjuke.com/loupan/all/'
+            url = 'https://jx.fang.anjuke.com/?from=navigation'
             # 解析网页，并存储数据
             self.analyze_info(url)
 
@@ -125,6 +128,7 @@ class SaleHouse(object):
         self.collection_name = 'sale_house'
         self.collection = None
         self.total = 0
+        self.referer = 'https://jx.anjuke.com/?pi=PZ-baidu-pc-all-biaoti'
         self.sale_log = DateFileLogger('/var/python/crawler/log/sale_house_' + str(report_date) + '.log', level='info')
 
     def analyze_info(self, url):
@@ -133,7 +137,7 @@ class SaleHouse(object):
         :param url: 网页源码
         """
         house_list = []
-        doc = pyQuery(get_html(url))
+        doc = pyQuery(get_html(url, self.referer))
         items = doc('#houselist-mod-new .list-item').items()
         for item in items:
             detail = ' '.join(item.find('.details-item').text().split()).split(' ')
@@ -172,6 +176,8 @@ class SaleHouse(object):
         # 获取下一页，如果有下一页的，继续爬取下一页的内容
         next_url = doc('.multi-page .aNxt').attr('href')
         if next_url:
+            # 引用上一个访问地址
+            self.referer = url
             time.sleep(2)
             self.sale_log.logger.info('next => %s' % next_url)
             self.analyze_info(next_url)
@@ -185,11 +191,11 @@ class SaleHouse(object):
             db = client[self.db_name]
             self.collection = db[self.collection_name]
 
-            print('sale start ... 清空今日二手房数据：', self.report_date)
+            self.sale_log.logger.info('sale start ... 清空今日二手房数据：%s' % self.report_date)
             self.collection.remove({'report_date': self.report_date})
 
             # 首页地址
-            url = 'https://jx.anjuke.com/sale/'
+            url = 'https://jx.anjuke.com/sale/?from=navigation'
             # 解析源码，并存储数据
             self.analyze_info(url)
 

@@ -56,10 +56,10 @@ class DateFileLogger(object):
         self.logger.addHandler(fh)
 
         # 往屏幕上输出
-        # sh = logging.StreamHandler()
+        sh = logging.StreamHandler()
         # 设置屏幕上显示的格式
-        # sh.setFormatter(FORMAT_STR)
-        # self.logger.addHandler(sh)
+        sh.setFormatter(FORMAT_STR)
+        self.logger.addHandler(sh)
 
 
 if __name__ == '__main__':
