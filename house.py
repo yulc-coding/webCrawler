@@ -24,12 +24,13 @@ class NewHouse(object):
 
     def __init__(self, report_date):
         self.report_date = report_date
-        self.db_name = 'frame'
+        self.db_name = 'project'
         self.collection_name = 'new_house'
         self.collection = None
         self.total = 0
         self.referer = 'https://jx.anjuke.com/?pi=PZ-baidu-pc-all-biaoti'
-        self.new_log = DateFileLogger('/var/python/crawler/log/new_house_' + str(report_date) + '.log', level='info')
+        # self.new_log = DateFileLogger('/var/python/crawler/log/new_house_' + str(report_date) + '.log', level='info')
+        self.new_log = DateFileLogger('./log/new_house_' + str(report_date) + '.log', level='info')
 
     def analyze_info(self, url):
         """
@@ -93,8 +94,7 @@ class NewHouse(object):
         client = None
         try:
             # 连接mongoDB 默认localhost:27017
-            # client = pymongo.MongoClient(host=MONGO_HOST, port=MONGO_PORT, username=AUTH_USER, password=AUTH_PWD)
-            client = pymongo.MongoClient(host=MONGO_HOST, port=MONGO_PORT)
+            client = pymongo.MongoClient(host=MONGO_HOST, port=MONGO_PORT, username=AUTH_USER, password=AUTH_PWD)
             db = client[self.db_name]
             self.collection = db[self.collection_name]
 
@@ -124,12 +124,13 @@ class SaleHouse(object):
 
     def __init__(self, report_date):
         self.report_date = report_date
-        self.db_name = 'frame'
+        self.db_name = 'project'
         self.collection_name = 'sale_house'
         self.collection = None
         self.total = 0
         self.referer = 'https://jx.anjuke.com/?pi=PZ-baidu-pc-all-biaoti'
-        self.sale_log = DateFileLogger('/var/python/crawler/log/sale_house_' + str(report_date) + '.log', level='info')
+        # self.sale_log = DateFileLogger('/var/python/crawler/log/sale_house_' + str(report_date) + '.log', level='info')
+        self.sale_log = DateFileLogger('./log/sale_house_' + str(report_date) + '.log', level='info')
 
     def analyze_info(self, url):
         """
@@ -186,8 +187,7 @@ class SaleHouse(object):
         client = None
         try:
             # 连接mongoDB 默认localhost:27017
-            # client = pymongo.MongoClient(host=MONGO_HOST, port=MONGO_PORT, username=AUTH_USER, password=AUTH_PWD)
-            client = pymongo.MongoClient(host=MONGO_HOST, port=MONGO_PORT)
+            client = pymongo.MongoClient(host=MONGO_HOST, port=MONGO_PORT, username=AUTH_USER, password=AUTH_PWD)
             db = client[self.db_name]
             self.collection = db[self.collection_name]
 
